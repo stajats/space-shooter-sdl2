@@ -7,19 +7,19 @@ void Effect::setRGBA(int r, int g, int b, int a){
 	this->a = a;
 }
 
-int Effect::getR(){
+auto Effect::getR() -> int{
 	return r;
 }
 
-int Effect::getG(){
+auto Effect::getG() -> int{
 	return g;
 }
 
-int Effect::getB(){
+auto Effect::getB() -> int{
 	return b;
 }
 
-int Effect::getA(){
+auto Effect::getA() -> int{
 	return a;
 }
 

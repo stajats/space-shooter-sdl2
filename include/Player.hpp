@@ -13,18 +13,18 @@ class Player:public Entity{
 	public:
 		Player();
 		void move(); //Overriding superclass move function
-		void keyDown(SDL_KeyboardEvent*);
-		void keyUp(SDL_KeyboardEvent*);
-		void updateAmmo(int);
-		void setReload(int);
-		void setBulletType(int);
-		void setEnterStatus(bool);
-		void setDieStatus(bool);
-		int getAmmo();
-		int getReload();
-		int getBulletType();
-		bool fireStatus();
-		bool enterStatus();
-		bool died();
+		void keyDown(SDL_KeyboardEvent* /*event*/);
+		void keyUp(SDL_KeyboardEvent* /*event*/);
+		void updateAmmo(int /*ammo*/);
+		void setReload(int /*reload*/);
+		void setBulletType(int /*type*/);
+		void setEnterStatus(bool /*status*/);
+		void setDieStatus(bool /*status*/);
+		auto getAmmo() -> int;
+		auto getReload() -> int;
+		auto getBulletType() -> int;
+		auto fireStatus() -> bool;
+		auto enterStatus() -> bool;
+		auto died() -> bool;
 		void resetInput();
 };

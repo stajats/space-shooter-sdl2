@@ -4,7 +4,7 @@ Player::Player(){
 	up = left = down = right = fire = die = false;
 	reload = 0;
 	speed = 10;
-	bulletType = ammo = enterGame = 0;
+	bulletType = ((ammo = static_cast<int>(enterGame = 0) != 0));
 }
 
 void Player::move(){
@@ -33,7 +33,7 @@ void Player::move(){
 }
 
 void Player::keyDown(SDL_KeyboardEvent *event){
-	if(!(event->repeat)){
+	if((event->repeat) == 0u){
 		switch(event->keysym.scancode){
 		case SDL_SCANCODE_W:
 		case SDL_SCANCODE_UP:
@@ -59,7 +59,7 @@ void Player::keyDown(SDL_KeyboardEvent *event){
 }
 
 void Player::keyUp(SDL_KeyboardEvent *event){
-	if(!(event->repeat)){
+	if((event->repeat) == 0u){
 		switch(event->keysym.scancode){
 		case SDL_SCANCODE_W:
 		case SDL_SCANCODE_UP:
@@ -93,7 +93,7 @@ void Player::setReload(int reload){
 }
 
 void Player::setBulletType(int type){
-	this->bulletType = type;
+	this->bulletType = (type != 0);
 }
 
 void Player::setEnterStatus(bool status){
@@ -104,27 +104,27 @@ void Player::setDieStatus(bool status){
 	this->die = status;
 }
 
-int Player::getAmmo(){
+auto Player::getAmmo() -> int{
 	return ammo;
 }
 
-int Player::getReload(){
+auto Player::getReload() -> int{
 	return reload;
 }
 
-int Player::getBulletType(){
-	return bulletType;
+auto Player::getBulletType() -> int{
+	return static_cast<int>(bulletType);
 }
 
-bool Player::fireStatus(){
+auto Player::fireStatus() -> bool{
 	return fire;
 }
 
-bool Player::enterStatus(){
+auto Player::enterStatus() -> bool{
 	return enterGame;
 }
 
-bool Player::died(){
+auto Player::died() -> bool{
 	return die;
 }
 

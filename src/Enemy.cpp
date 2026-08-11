@@ -1,7 +1,7 @@
 #include "Enemy.hpp"
 
 Enemy::Enemy(){
-	reload = changeMovement = ticks = 0;
+	reload = static_cast<int>(changeMovement = ((ticks = 0)) != 0);
 }
 
 void Enemy::setReload(int reload){
@@ -16,14 +16,14 @@ void Enemy::updateTicks(){
 	this->ticks++;
 }
 
-int Enemy::getReload(){
+auto Enemy::getReload() -> int{
 	return reload;
 }
 
-bool Enemy::getChangeMovement(){
+auto Enemy::getChangeMovement() -> bool{
 	return changeMovement;
 }
 
-int Enemy::getTIcks(){
+auto Enemy::getTIcks() -> int{
 	return ticks;
 }

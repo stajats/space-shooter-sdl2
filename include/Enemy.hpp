@@ -8,10 +8,10 @@ class Enemy:public Entity{
 		bool changeMovement;
 	public:
 		Enemy();
-		void setReload(int);
-		void setChangeMovement(bool);
+		void setReload(int /*reload*/);
+		void setChangeMovement(bool /*changed*/);
 		void updateTicks();
-		int getReload();
-		bool getChangeMovement();
-		int getTIcks();
+		auto getReload() -> int;
+		auto getChangeMovement() -> bool;
+		auto getTIcks() -> int;
 };

@@ -13,8 +13,8 @@
 
 #define enemyTexture "sprites/enemyShip.png"
 #define enemyHP 5
-#define enemySpeed -5
-#define enemyBulletSpeed -15
+#define enemySpeed (-5)
+#define enemyBulletSpeed (-15)
 
 #define bulletHP 1
 

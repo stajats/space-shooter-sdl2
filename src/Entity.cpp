@@ -2,7 +2,7 @@
 
 Entity::Entity(){
 	x = y = dx = dy = HP = identity = 0;
-	texture = NULL;
+	texture = nullptr;
 }
 
 void Entity::move(){
@@ -42,34 +42,32 @@ void Entity::setTexture(SDL_Texture *texture){
 	this->texture = texture;
 }
 
-int Entity::getX(){
+auto Entity::getX() -> int{
 	return x;
 }
 
-int Entity::getY(){
+auto Entity::getY() -> int{
 	return y;
 }
 
-int Entity::getHP(){
+auto Entity::getHP() -> int{
 	return HP;
 }
 
-int Entity::getDX(){
+auto Entity::getDX() -> int{
 	return dx;
 }
 
-int Entity::getDY(){
+auto Entity::getDY() -> int{
 	return dy;
 }
 
-int Entity::getIdentity(){
+auto Entity::getIdentity() -> int{
 	return identity;
 }
 
-SDL_Texture* Entity::getTexture(){
+auto Entity::getTexture() -> SDL_Texture*{
 	return texture;
 }
 
-Entity::~Entity(){
-
-}
+Entity::~Entity()= default;

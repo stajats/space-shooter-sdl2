@@ -56,12 +56,12 @@ class Game{
 		void enterAnimation();
 		void getInput();
 		void drawBackground();
-		void addExplosion(int, int);
+		void addExplosion(int /*x*/, int /*y*/);
 		void updateHUD();
 		void updateScene();
-		void draw(SDL_Texture*, int, int);
-		SDL_Texture* loadTexture(std::string);
-		bool detectCollision(int, int, int, int, int, int, int, int);
+		void draw(SDL_Texture* /*texture*/, int /*x*/, int /*y*/);
+		auto loadTexture(const std::string /*path*/&) -> SDL_Texture*;
+		static auto detectCollision(int /*x1*/, int /*y1*/, int /*w1*/, int /*h1*/, int /*x2*/, int /*y2*/, int /*w2*/, int /*h2*/) -> bool;
 	public:
 		void start();
 };

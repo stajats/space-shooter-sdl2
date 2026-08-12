@@ -35,13 +35,6 @@ target_include_directories(space-shooter PRIVATE
     ${SDL2_TTF_INCLUDE_DIRS}
 )
 
-target_link_directories(space-shooter PRIVATE
-    ${SDL2_LIBRARY_DIRS}
-    ${SDL2_IMAGE_LIBRARY_DIRS}
-    ${SDL2_MIXER_LIBRARY_DIRS}
-    ${SDL2_TTF_LIBRARY_DIRS}
-)
-
 target_link_libraries(space-shooter PRIVATE
     ${SDL2_LIBRARIES}
     ${SDL2_IMAGE_LIBRARIES}

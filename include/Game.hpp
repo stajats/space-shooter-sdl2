@@ -29,6 +29,11 @@ class Game
         Mix_Music* music;
         bool running;
     } app;
+		SDL_Texture* normalBulletTex = nullptr;
+		SDL_Texture* waveBulletTex = nullptr;
+		SDL_Texture* enemyTex = nullptr;
+		SDL_Texture* bonusHPTex = nullptr;
+		SDL_Texture* enhanceAttackTex = nullptr;
     struct
     {
         std::vector<Entity> bullets;
@@ -37,22 +42,23 @@ class Game
         std::vector<Entity> debrises;
         std::vector<std::vector<Effect>> effects;
     } Entities;
-    TTF_Font* font;
+    TTF_Font* font = nullptr;
     SDL_Texture* debrisTexture[4];
     std::stringstream healthText, scoreText, hiScoreText;
     std::fstream file;
     Player player;
     Entity playerBullet, enemyBullet, powerUp, debris;
-    Enemy* enemy;
+    Enemy* enemy = nullptr;
     Effect explosion;
-    int enemySpawnTimer, enemyFire;
-    int lastY;
-    int gameTicks;
+    int enemySpawnTimer = 0, enemyFire = 0;
+    int lastY = 0;
+    int gameTicks = 0;
     void prepareScene();
-    int backgroundX;
-    int score, highScore;
+    int backgroundX = 0;
+    int score = 0, highScore = 0;
     void initGame();
-    void initPlayer();
+    void deinitGame();
+		void initPlayer();
     void titleScreen();
     void endScreen();
     void updateEntities();

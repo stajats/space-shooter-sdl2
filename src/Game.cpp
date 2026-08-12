@@ -34,7 +34,6 @@ Game::titleScreen()
     SDL_Event e;
     while (true)
     {
-        app.music = Mix_LoadMUS(bgSound);
         drawBackground();
         draw(app.titleScreen, 0, 0);
         updateScene();
@@ -43,6 +42,7 @@ Game::titleScreen()
             switch (e.type)
             {
                 case SDL_QUIT:
+										deinitGame();
                     exit(0);
                     break;
                 case SDL_KEYDOWN:
@@ -56,6 +56,7 @@ Game::titleScreen()
                     if (e.key.keysym.scancode == SDL_SCANCODE_ESCAPE)
                     {
                         Mix_PlayChannel(CH_MENU, app.sounds[SOUND_BUTTON], 0);
+												deinitGame();
                         exit(0);
                     }
                     if (e.key.keysym.scancode == SDL_SCANCODE_1)
@@ -82,14 +83,17 @@ Game::endScreen()
     SDL_Event e;
     bool input = true;
     scoreText << "Score  : " << score;
-    while (true)
+    
+		SDL_Surface* scoreSurface = TTF_RenderText_Solid(
+      font, scoreText.str().c_str(), { 255, 255, 255, 0 });
+    SDL_Texture* scoreTXT =
+      SDL_CreateTextureFromSurface(app.renderer, scoreSurface);
+		SDL_FreeSurface(scoreSurface);
+		
+		while (true)
     {
         drawBackground();
         draw(app.endScreen, 0, 0);
-        SDL_Surface* scoreSurface = TTF_RenderText_Solid(
-          font, scoreText.str().c_str(), { 255, 255, 255, 0 });
-        SDL_Texture* scoreTXT =
-          SDL_CreateTextureFromSurface(app.renderer, scoreSurface);
         draw(scoreTXT, 0, 0);
         updateScene();
         while (SDL_PollEvent(&e) != 0)
@@ -97,6 +101,7 @@ Game::endScreen()
             switch (e.type)
             {
                 case SDL_QUIT:
+										deinitGame();
                     exit(0);
                     break;
                 case SDL_KEYDOWN:
@@ -105,17 +110,64 @@ Game::endScreen()
                         initPlayer();
                         app.running = true;
                         Mix_PlayChannel(CH_MENU, app.sounds[SOUND_BUTTON], 0);
+												SDL_DestroyTexture(scoreTXT);
                         return;
                     }
                     if (e.key.keysym.scancode == SDL_SCANCODE_ESCAPE)
                     {
                         Mix_PlayChannel(CH_MENU, app.sounds[SOUND_BUTTON], 0);
+												SDL_DestroyTexture(scoreTXT);
                         return;
                     }
                     break;
             }
         }
     }
+}
+
+void
+Game::deinitGame()
+{
+    for (auto* fighter : Entities.fighters)
+    {
+        delete fighter;
+    }
+    Entities.fighters.clear();
+
+    SDL_DestroyTexture(normalBulletTex);
+    SDL_DestroyTexture(waveBulletTex);
+    SDL_DestroyTexture(enemyTex);
+    SDL_DestroyTexture(bonusHPTex);
+    SDL_DestroyTexture(enhanceAttackTex);
+
+    SDL_DestroyTexture(player.getTexture());
+    SDL_DestroyTexture(enemyBullet.getTexture());
+
+    SDL_DestroyTexture(app.background);
+    SDL_DestroyTexture(app.titleScreen);
+    SDL_DestroyTexture(app.endScreen);
+
+    for (auto& texture : debrisTexture)
+    {
+        SDL_DestroyTexture(texture);
+    }
+
+    SDL_DestroyTexture(explosion.getTexture());
+
+    Mix_FreeChunk(app.sounds[SOUND_FIRE]);
+    Mix_FreeChunk(app.sounds[SOUND_EXPLOSION]);
+    Mix_FreeChunk(app.sounds[SOUND_BUTTON]);
+    Mix_FreeMusic(app.music);
+
+    TTF_CloseFont(font);
+
+    SDL_DestroyRenderer(app.renderer);
+    SDL_DestroyWindow(app.window);
+
+    Mix_CloseAudio();
+    TTF_Quit();
+    IMG_Quit();
+    SDL_Quit();
 }
 
 void
@@ -140,6 +192,16 @@ Game::initGame()
         cout << "Could not initialize SDL: " << SDL_GetError() << '\n';
         exit(-1);
     }
+    if ((IMG_Init(IMG_INIT_PNG | IMG_INIT_JPG)) == 0)
+    {
+        cout << "Could not initialize SDL Image : " << SDL_GetError() << '\n';
+        exit(-1);
+    }
+    if (TTF_Init() != 0)
+    {
+        cout << "Could not initialize TTF : " << TTF_GetError() << '\n';
+        exit(-1);
+    }
     app.window = SDL_CreateWindow("Space Impact V1.0",
                                   SDL_WINDOWPOS_CENTERED,
                                   SDL_WINDOWPOS_CENTERED,
@@ -153,30 +215,33 @@ Game::initGame()
     }
     SDL_Surface* sf = IMG_Load(icon);
     SDL_SetWindowIcon(app.window, sf);
+		SDL_FreeSurface(sf);
     app.renderer = SDL_CreateRenderer(app.window, -1, SDL_RENDERER_ACCELERATED);
     if (app.renderer == nullptr)
     {
         cout << "Could not create renderer : " << SDL_GetError() << '\n';
         exit(-1);
     }
-    if ((IMG_Init(IMG_INIT_PNG | IMG_INIT_JPG)) == 0)
-    {
-        cout << "Could not initialize SDL Image : " << SDL_GetError() << '\n';
-        exit(-1);
-    }
-    if (TTF_Init() != 0)
-    {
-        cout << "Could not initialize TTF : " << TTF_GetError() << '\n';
-        exit(-1);
-    }
-    font = TTF_OpenFont("myriadProRegular.ttf", 22);
+    font = TTF_OpenFont("DejaVuSans.ttf", 22);
+		if (font == nullptr)
+		{
+				cout << "Could not load font: " << TTF_GetError() << '\n';
+				exit(-1);
+		}
     score = 0;
     if (Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 4096) != 0)
     {
         cout << "Could not initialize SDL Mixer : " << Mix_GetError() << '\n';
         exit(-1);
     }
-    Mix_AllocateChannels(soundChannel);
+		
+		normalBulletTex = loadTexture(normalBulletTexture);
+		waveBulletTex = loadTexture(waveBulletTexture);
+		enemyTex = loadTexture(enemyTexture);
+		bonusHPTex = loadTexture(bonusHPTexture);
+		enhanceAttackTex = loadTexture(enchanceAttackTexture);
+    
+		Mix_AllocateChannels(soundChannel);
     app.music = Mix_LoadMUS(bgSound);
     app.sounds[SOUND_FIRE] = Mix_LoadWAV(fireSound);
     app.sounds[SOUND_EXPLOSION] = Mix_LoadWAV(explosionSound);
@@ -189,7 +254,15 @@ Game::initGame()
     app.running = false;
 
     file.open("scores.txt", ios::in);
-    file >> highScore;
+		if (file)
+		{
+				file >> highScore;
+				file.close();
+		}	
+		else
+		{
+		    highScore = 0;
+		}
 
     enemySpawnTimer = 60;
 
@@ -199,7 +272,7 @@ Game::initGame()
     playerBullet.setDX(playerBulletSpeed);
     playerBullet.updateHP(bulletHP);
     playerBullet.setIdentity(normalBullet);
-    playerBullet.setTexture(loadTexture(waveBulletTexture));
+    playerBullet.setTexture(waveBulletTex);
 
     enemyBullet.setDX(enemyBulletSpeed);
     enemyBullet.setHP(1);
@@ -274,7 +347,7 @@ Game::updateEntities()
         {
             case normalBullet:
                 playerBullet.setIdentity(normalBullet);
-                playerBullet.setTexture(loadTexture(normalBulletTexture));
+                playerBullet.setTexture(normalBulletTex);
                 playerBullet.setX(player.getX() + 50);
                 playerBullet.setY(player.getY() + 45);
                 playerBullet.setDX(playerBulletSpeed);
@@ -283,7 +356,7 @@ Game::updateEntities()
                 break;
             case waveBullet:
                 playerBullet.setIdentity(waveBullet);
-                playerBullet.setTexture(loadTexture(waveBulletTexture));
+                playerBullet.setTexture(waveBulletTex);
                 playerBullet.setX(player.getX() + 65);
                 playerBullet.setY(player.getY() + 40);
                 playerBullet.setDX(15);
@@ -301,7 +374,7 @@ Game::updateEntities()
         enemy = new Enemy();
         enemy->setX(WIDTH - 80);
         enemy->setDX(enemySpeed);
-        enemy->setTexture(loadTexture(enemyTexture));
+        enemy->setTexture(enemyTex);
         enemy->setHP((gameTicks / 1000) +
                      5); // Add one to previous enemy HP every approx 40 secs
         enemyBullet.setHP(1 + (gameTicks / 2000));
@@ -353,6 +426,7 @@ Game::updateEntities()
     {
         if ((*i)->getX() <= 0)
         {
+						delete *i;
             i = Entities.fighters.erase(i);
         }
         else if ((*i)->getHP() <= 0)
@@ -381,11 +455,11 @@ Game::updateEntities()
                 {
                     case 0:
                         powerUp.setIdentity(bonusHP);
-                        powerUp.setTexture(loadTexture(bonusHPTexture));
+                        powerUp.setTexture(bonusHPTex);
                         break;
                     case 1:
                         powerUp.setIdentity(enchanceATK);
-                        powerUp.setTexture(loadTexture(enchanceAttackTexture));
+                        powerUp.setTexture(enhanceAttackTex);
                         break;
                 }
                 powerUp.setX((*i)->getX());
@@ -395,6 +469,7 @@ Game::updateEntities()
                 Entities.powerUp.push_back(powerUp);
             }
             score += 5 + (gameTicks / 500);
+						delete *i;
             i = Entities.fighters.erase(i);
         }
         else
@@ -729,23 +804,35 @@ Game::addExplosion(int x, int y)
 void
 Game::updateHUD()
 {
+
     healthText << "Health : " << player.getHP();
     scoreText << "Score   : " << score;
     hiScoreText << "High Score : " << highScore;
+
     SDL_Surface* lifeSurface = TTF_RenderText_Solid(
       font, healthText.str().c_str(), { 255, 255, 255, 0 });
     SDL_Texture* lifeTXT =
       SDL_CreateTextureFromSurface(app.renderer, lifeSurface);
+    SDL_FreeSurface(lifeSurface);
+
     SDL_Surface* scoreSurface =
       TTF_RenderText_Solid(font, scoreText.str().c_str(), { 255, 255, 255, 0 });
     SDL_Texture* scoreTXT =
       SDL_CreateTextureFromSurface(app.renderer, scoreSurface);
+    SDL_FreeSurface(scoreSurface);
+
     SDL_Surface* hsSurface = TTF_RenderText_Solid(
       font, hiScoreText.str().c_str(), { 255, 255, 255, 0 });
     SDL_Texture* hsTXT = SDL_CreateTextureFromSurface(app.renderer, hsSurface);
+    SDL_FreeSurface(hsSurface);
+
     draw(lifeTXT, 0, 0);
     draw(scoreTXT, 0, 20);
     draw(hsTXT, 0, 40);
+
+    SDL_DestroyTexture(lifeTXT);
+    SDL_DestroyTexture(scoreTXT);
+    SDL_DestroyTexture(hsTXT);
 }
 
 void
@@ -778,6 +865,11 @@ Game::updateScene()
     {
         Entities.bullets.clear();
         Entities.debrises.clear();
+
+				for (auto* fighter : Entities.fighters)
+		    {
+						delete fighter;
+				}
         Entities.fighters.clear();
         Entities.powerUp.clear();
         app.running = false;

@@ -27,6 +27,8 @@ target_compile_options(space-shooter PRIVATE
     -Wextra
 )
 
+target_compile_options(space-shooter PRIVATE $<$<CONFIG:Debug>:-g>)
+
 target_include_directories(space-shooter PRIVATE
     ${CMAKE_SOURCE_DIR}/include
     ${SDL2_INCLUDE_DIRS}

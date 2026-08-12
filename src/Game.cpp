@@ -6,7 +6,7 @@ void Game::start(){
 	while(true){
 		titleScreen();
 		while(app.running){
-			if(player.enterStatus() == false){
+			if(!player.enterStatus()){
 				enterAnimation();
 				continue;
 			}
@@ -29,7 +29,7 @@ void Game::titleScreen(){
 		drawBackground();
 		draw(app.titleScreen, 0, 0);
 		updateScene();
-		while(SDL_PollEvent(&e)){
+		while(SDL_PollEvent(&e) != 0){
 			switch(e.type){
 				case SDL_QUIT:
 					exit(0);
@@ -47,7 +47,7 @@ void Game::titleScreen(){
 					}
 					if(e.key.keysym.scancode == SDL_SCANCODE_1){
 						Mix_PlayChannel(CH_MENU, app.sounds[SOUND_BUTTON], 0);
-						if(Mix_PausedMusic()){
+						if(Mix_PausedMusic() != 0){
 							Mix_ResumeMusic();
 						}else{
 							Mix_PauseMusic();
@@ -70,7 +70,7 @@ void Game::endScreen(){
 		SDL_Texture *scoreTXT = SDL_CreateTextureFromSurface(app.renderer, scoreSurface);
 		draw(scoreTXT, 0, 0);
 		updateScene();
-		while(SDL_PollEvent(&e)){
+		while(SDL_PollEvent(&e) != 0){
 			switch(e.type){
 				case SDL_QUIT:
 					exit(0);
@@ -105,33 +105,33 @@ void Game::enterAnimation(){
 
 void Game::initGame(){
 	if(SDL_Init(SDL_INIT_VIDEO) < 0){
-		cout << "Could not initialize SDL: " << SDL_GetError() << endl;
+		cout << "Could not initialize SDL: " << SDL_GetError() << '\n';
 		exit(-1);
 	}
-	app.window = SDL_CreateWindow("Space Impact V1.5", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, SDL_WINDOW_SHOWN);
-	if(!app.window){
-		cout << "Could not create window : " << SDL_GetError() << endl;
+	app.window = SDL_CreateWindow("Space Impact V1.0", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, SDL_WINDOW_SHOWN);
+	if(app.window == nullptr){
+		cout << "Could not create window : " << SDL_GetError() << '\n';
 		exit(-1);
 	}
 	SDL_Surface *sf = IMG_Load(icon);
 	SDL_SetWindowIcon(app.window, sf);
 	app.renderer = SDL_CreateRenderer(app.window, -1, SDL_RENDERER_ACCELERATED);
-	if(!app.renderer){
-		cout << "Could not create renderer : " << SDL_GetError() << endl;
+	if(app.renderer == nullptr){
+		cout << "Could not create renderer : " << SDL_GetError() << '\n';
 		exit(-1);
 	}
-	if(!(IMG_Init(IMG_INIT_PNG | IMG_INIT_JPG))){
-		cout << "Could not initialize SDL Image : " << SDL_GetError() << endl;
+	if((IMG_Init(IMG_INIT_PNG | IMG_INIT_JPG)) == 0){
+		cout << "Could not initialize SDL Image : " << SDL_GetError() << '\n';
 		exit(-1);
 	}
 	if(TTF_Init() != 0){
-		cout << "Could not initialize TTF : " << TTF_GetError() << endl;
+		cout << "Could not initialize TTF : " << TTF_GetError() << '\n';
 		exit(-1);
 	}
 	font = TTF_OpenFont("myriadProRegular.ttf", 22);
 	score = 0;
 	if(Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 4096) != 0){
-		cout << "Could not initialize SDL Mixer : " << Mix_GetError() << endl;
+		cout << "Could not initialize SDL Mixer : " << Mix_GetError() << '\n';
 		exit(-1);
 	}
 	Mix_AllocateChannels(soundChannel);
@@ -180,7 +180,7 @@ void Game::initGame(){
 
 void Game::initPlayer(){
 	player.setX(WIDTH / 2);
-	player.setY(HEIGHT / 2 - 50);
+	player.setY((HEIGHT / 2) - 50);
 	player.setHP(10);
 	player.setDieStatus(false);
 	player.setEnterStatus(false);
@@ -190,7 +190,7 @@ void Game::initPlayer(){
 
 void Game::getInput(){
 	SDL_Event e;
-	while(SDL_PollEvent(&e)){
+	while(SDL_PollEvent(&e) != 0){
 		switch(e.type){
 			case SDL_QUIT:
 				exit(0);
@@ -211,7 +211,7 @@ void Game::updateEntities(){
 		draw(player.getTexture(), player.getX(), player.getY()); //Draw player plane
 	}
 	//Player fire
-	if(player.fireStatus() == true && player.getReload() == 0){
+	if(player.fireStatus() && player.getReload() == 0){
 		if(player.getAmmo() == 0){
 			player.setBulletType(normalBullet);
 		}
@@ -245,15 +245,15 @@ void Game::updateEntities(){
 		enemy->setX(WIDTH - 80);
 		enemy->setDX(enemySpeed);
 		enemy->setTexture(loadTexture(enemyTexture));
-		enemy->setHP(gameTicks / 1000 + 5); //Add one to previous enemy HP every approx 40 secs
-		enemyBullet.setHP(1 + gameTicks / 2000);
+		enemy->setHP((gameTicks / 1000) + 5); //Add one to previous enemy HP every approx 40 secs
+		enemyBullet.setHP(1 + (gameTicks / 2000));
 		enemySpawnTimer = 60;
-		srand(time(NULL));
+		srand(time(nullptr));
 		if(rand() % 100 < 30){
-			cout << "Normal spawned" << endl;
+			cout << "Normal spawned" << '\n';
 			enemy->setIdentity(ePlane); //Normal
 		}else{
-			cout << "Wave spawned" << endl;
+			cout << "Wave spawned" << '\n';
 			enemy->setIdentity(ePlane2); //Wave
 		}
 		int y = rand() % HEIGHT;
@@ -289,17 +289,17 @@ void Game::updateEntities(){
 			Mix_PlayChannel(CH_OTHER, app.sounds[SOUND_EXPLOSION], 0);
 			addExplosion((*i)->getX(), ((*i)->getY()));
 			//Fighters debris
-			int debrisCount = rand() % 4 + 1;
+			int debrisCount = (rand() % 4) + 1;
 			debris.setX((*i)->getX() + 40);
 			debris.setY((*i)->getY() + 40);
 			for(int j = 0; j < debrisCount; j++){
 				debris.setTexture(debrisTexture[j]);
-				debris.setDX((rand() % 2) % 2 ? 1 : -1);
-				debris.setDY((rand() % 2) % 2 ? 1 : -1);
+				debris.setDX((((rand() % 2) % 2) != 0) ? 1 : -1);
+				debris.setDY((((rand() % 2) % 2) != 0) ? 1 : -1);
 				Entities.debrises.push_back(debris);
 			}
 			//Item drop mechanism
-			srand(time(NULL));
+			srand(time(nullptr));
 			int drop = rand() % 100;
 			if(drop < 40){
 				int type = rand() % 2;
@@ -320,13 +320,16 @@ void Game::updateEntities(){
 				powerUp.setDY(rand() % 2 == 1 ? powerUpSPD : -powerUpSPD);
 				Entities.powerUp.push_back(powerUp);
 			}
-			score += 5 + gameTicks/500;
+			score += 5 + (gameTicks/500);
 			i = Entities.fighters.erase(i);
 		}else{
-			int w, h, wP, hP;
-			Enemy *p = dynamic_cast<Enemy *>(*i); //Cast base class to derived class to access derived class member functions
-			SDL_QueryTexture((*i)->getTexture(), NULL, NULL, &w, &h);
-			SDL_QueryTexture(player.getTexture(), NULL, NULL, &wP, &hP);
+			int w;
+			int h;
+			int wP;
+			int hP;
+			auto *p = dynamic_cast<Enemy *>(*i); //Cast base class to derived class to access derived class member functions
+			SDL_QueryTexture((*i)->getTexture(), nullptr, nullptr, &w, &h);
+			SDL_QueryTexture(player.getTexture(), nullptr, nullptr, &wP, &hP);
 			if(detectCollision((*i)->getX(), (*i)->getY(), w, h, player.getX(), player.getY(), wP, hP)){ //Check if player plane is colliding with enemy
 				player.updateHP(-2);
 				(*i)->updateHP(-5);
@@ -334,7 +337,7 @@ void Game::updateEntities(){
 			//i->setDY(5 * sin(gameTicks * 0.5 * 3.14 / 15)) -> Wave pattern formula
 			int num = rand() % 200;
 			p->updateTicks();
-			if(num < 5 && p->getChangeMovement() == false){
+			if(num < 5 && !p->getChangeMovement()){
 				if(p->getIdentity() == ePlane){
 					p->setIdentity(ePlane2);
 				}else{
@@ -349,7 +352,7 @@ void Game::updateEntities(){
 			}
 			(*i)->move();
 			if(p->getReload() == 0){
-				p->setReload((75 - gameTicks / 1000 < 30 ? 30 : 75 - gameTicks / 1000));
+				p->setReload((75 - (gameTicks / 1000) < 30 ? 30 : 75 - (gameTicks / 1000)));
 				enemyBullet.setX((*i)->getX() - 50);
 				enemyBullet.setY((*i)->getY() + 35);
 				Entities.bullets.push_back(enemyBullet);
@@ -363,9 +366,12 @@ void Game::updateEntities(){
 
 	//Draw and check power up collision
 	for(auto i = Entities.powerUp.begin(); i != Entities.powerUp.end(); ){
-		int powerUpW, powerUpH, playerW, playerH;
-		SDL_QueryTexture(i->getTexture(), NULL, NULL, &powerUpW, &powerUpH);
-		SDL_QueryTexture(player.getTexture(), NULL, NULL, &playerW, &playerH);
+		int powerUpW;
+		int powerUpH;
+		int playerW;
+		int playerH;
+		SDL_QueryTexture(i->getTexture(), nullptr, nullptr, &powerUpW, &powerUpH);
+		SDL_QueryTexture(player.getTexture(), nullptr, nullptr, &playerW, &playerH);
 		if(detectCollision(i->getX(), i->getY(), powerUpW, powerUpH, player.getX(), player.getY(), playerW, playerH)){
 			switch(i->getIdentity()){
 				case bonusHP:
@@ -401,17 +407,17 @@ void Game::updateEntities(){
 	//Draw explosion effect
 	for(auto i = Entities.effects.begin(); i != Entities.effects.end(); ){
 		bool remove = false;
-		for(auto j = i->begin(); j != i->end(); j++){
-			if(j->getA() <= 0){
+		for(auto & j : *i){
+			if(j.getA() <= 0){
 				remove = true;
 				break;
 			}
 			SDL_SetRenderDrawBlendMode(app.renderer, SDL_BLENDMODE_ADD);
-			SDL_SetTextureBlendMode(j->getTexture(), SDL_BLENDMODE_ADD);
-			SDL_SetTextureColorMod(j->getTexture(), j->getR(), j->getG(), j->getB());
-			SDL_SetTextureAlphaMod(j->getTexture(), j->getA());
-			draw(j->getTexture(), j->getX(), j->getY());
-			j->updateA(-15);
+			SDL_SetTextureBlendMode(j.getTexture(), SDL_BLENDMODE_ADD);
+			SDL_SetTextureColorMod(j.getTexture(), j.getR(), j.getG(), j.getB());
+			SDL_SetTextureAlphaMod(j.getTexture(), j.getA());
+			draw(j.getTexture(), j.getX(), j.getY());
+			j.updateA(-15);
 		}
 		if(remove){
 			i = Entities.effects.erase(i);
@@ -422,24 +428,27 @@ void Game::updateEntities(){
 
 	//Draw debris
 	for(auto i = Entities.debrises.begin(); i != Entities.debrises.end();){
-		int w1, h1;
-		SDL_QueryTexture(i->getTexture(), NULL, NULL, &w1, &h1);
+		int w1;
+		int h1;
+		SDL_QueryTexture(i->getTexture(), nullptr, nullptr, &w1, &h1);
 		if(i->getX() <= 0 || i->getX() >= WIDTH - 20 || i->getY() <= 0 || i->getY() >= HEIGHT - 20 || i->getHP() <= 0){
 			i = Entities.debrises.erase(i);
 		}else{
-			for(auto j = Entities.fighters.begin(); j != Entities.fighters.end(); j++){
-				if((*j)->getHP() <= 0){
+			for(auto & fighter : Entities.fighters){
+				if(fighter->getHP() <= 0){
 					continue;
 				}
-				int w2, h2;
-				SDL_QueryTexture((*j)->getTexture(), NULL, NULL, &w2, &h2);
-				if(detectCollision(i->getX(), i->getY(), w1, h1, (*j)->getX(), (*j)->getY(), w2, h2)){
+				int w2;
+				int h2;
+				SDL_QueryTexture(fighter->getTexture(), nullptr, nullptr, &w2, &h2);
+				if(detectCollision(i->getX(), i->getY(), w1, h1, fighter->getX(), fighter->getY(), w2, h2)){
 					i->updateHP(-1);
-					(*j)->updateHP(-1);
+					fighter->updateHP(-1);
 				}
 			}
-			int wP, hP;
-			SDL_QueryTexture(player.getTexture(), NULL, NULL, &wP, &hP);
+			int wP;
+			int hP;
+			SDL_QueryTexture(player.getTexture(), nullptr, nullptr, &wP, &hP);
 			if(detectCollision(i->getX(), i->getY(), w1, h1, player.getX(), player.getY(), wP, hP)){
 				player.updateHP(-1);
 				i->updateHP(-1);
@@ -451,34 +460,39 @@ void Game::updateEntities(){
 	}
 
 	//Collision Detection
-	for(auto i = Entities.bullets.begin(); i != Entities.bullets.end(); i++){
-		int w1, h1;
-		SDL_QueryTexture(i->getTexture(), NULL, NULL, &w1, &h1);
-		for(auto j = Entities.fighters.begin(); j != Entities.fighters.end(); j++){
-			if((*j)->getHP() <= 0){
+	for(auto & bullet : Entities.bullets){
+		int w1;
+		int h1;
+		SDL_QueryTexture(bullet.getTexture(), nullptr, nullptr, &w1, &h1);
+		for(auto & fighter : Entities.fighters){
+			if(fighter->getHP() <= 0){
 				continue;
 			}
-			int w2, h2, wP, hP;
-			SDL_QueryTexture((*j)->getTexture(), NULL, NULL, &w2, &h2);
-			SDL_QueryTexture(player.getTexture(), NULL, NULL, &wP, &hP);
-			if(detectCollision(i->getX(), i->getY(), w1, h1, (*j)->getX(), (*j)->getY(), w2, h2) && i->getDX() > 0){ //Check if player bullet hits enemy
-				i->updateHP(-1);
-				(*j)->updateHP(-1);
+			int w2;
+			int h2;
+			int wP;
+			int hP;
+			SDL_QueryTexture(fighter->getTexture(), nullptr, nullptr, &w2, &h2);
+			SDL_QueryTexture(player.getTexture(), nullptr, nullptr, &wP, &hP);
+			if(detectCollision(bullet.getX(), bullet.getY(), w1, h1, fighter->getX(), fighter->getY(), w2, h2) && bullet.getDX() > 0){ //Check if player bullet hits enemy
+				bullet.updateHP(-1);
+				fighter->updateHP(-1);
 			}
-			if(detectCollision(i->getX(), i->getY(), w1, h1, player.getX(), player.getY(), wP, hP) && i->getIdentity() == eBullet){ //Chcek if enemy bullet hits player
+			if(detectCollision(bullet.getX(), bullet.getY(), w1, h1, player.getX(), player.getY(), wP, hP) && bullet.getIdentity() == eBullet){ //Chcek if enemy bullet hits player
 				player.updateHP(-1);
-				i->updateHP(-1);
+				bullet.updateHP(-1);
 			}
 		}
-		for(auto j = Entities.debrises.begin(); j != Entities.debrises.end(); j++){
-			if(j->getHP() <= 0){
+		for(auto & debrise : Entities.debrises){
+			if(debrise.getHP() <= 0){
 				continue;
 			}
-			int w2, h2;
-			SDL_QueryTexture(j->getTexture(), NULL, NULL, &w2, &h2);
-			if(detectCollision(i->getX(), i->getY(), w1, h1, j->getX(), j->getY(), w2, h2)){ //Check if player bullet hits enemy
-				i->updateHP(-1);
-				j->updateHP(-1);
+			int w2;
+			int h2;
+			SDL_QueryTexture(debrise.getTexture(), nullptr, nullptr, &w2, &h2);
+			if(detectCollision(bullet.getX(), bullet.getY(), w1, h1, debrise.getX(), debrise.getY(), w2, h2)){ //Check if player bullet hits enemy
+				bullet.updateHP(-1);
+				debrise.updateHP(-1);
 			}
 		}
 		if(player.getHP() <= 0 && !player.died()){
@@ -490,8 +504,9 @@ void Game::updateEntities(){
 }
 
 void Game::drawBackground(){
-	int w, h;
-	SDL_QueryTexture(app.background, NULL, NULL, &w, &h);
+	int w;
+	int h;
+	SDL_QueryTexture(app.background, nullptr, nullptr, &w, &h);
 	if(-w > --backgroundX){
 		backgroundX = 0;
 	}
@@ -578,10 +593,10 @@ void Game::updateScene(){
 	SDL_Delay(40);
 }
 
-SDL_Texture* Game::loadTexture(std::string path){
+auto Game::loadTexture(const std::string& path) -> SDL_Texture*{
 	SDL_Texture* texture = IMG_LoadTexture(app.renderer, path.c_str());
-	if(texture == NULL){
-		cout << "Error loading image : " << IMG_GetError() << endl;
+	if(texture == nullptr){
+		cout << "Error loading image : " << IMG_GetError() << '\n';
 		exit(-1);
 	}
 	return texture;
@@ -591,10 +606,10 @@ void Game::draw(SDL_Texture *texture, int x, int y){
 	SDL_Rect target;
 	target.x = x;
 	target.y = y;
-	SDL_QueryTexture(texture, NULL, NULL, &target.w, &target.h);
-	SDL_RenderCopy(app.renderer, texture, NULL, &target);
+	SDL_QueryTexture(texture, nullptr, nullptr, &target.w, &target.h);
+	SDL_RenderCopy(app.renderer, texture, nullptr, &target);
 }
 
-bool Game::detectCollision(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2){
+auto Game::detectCollision(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2) -> bool{
 	return (max(x1, x2) < min(x1 + w1, x2 + w2)) && (max(y1, y2) < min(y1 + h1, y2 + h2));
 }

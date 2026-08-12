@@ -1,27 +1,41 @@
 # Space Shooter
 
-Simple space shooter game made using the Simple Directmedia Layer V2 (SDL2) and C++ as a personal project for fun. It only includes basic air shooter game features, no wave or boss system included, only randomly spawned enemies appear on the map, explosion effects, scrolling space background and many more. Most of the sprites are hand-made using Adobe Photoshop CC 2019
+A simple space shooter game written in C++ using the Simple DirectMedia Layer 2 (SDL2). The project was originally created by andreanlay and has been forked for use in the Alati za razvoj softvera (AZRS) course at the Faculty of Mathematics, University of Belgrade.
 
-![](https://github.com/andreanlay/space-shooter-sdl2/blob/master/demo.gif)
+The game includes basic space-shooter features such as randomly spawned enemies, explosion effects, and a scrolling space background. Most of the original sprites were hand-made using Adobe Photoshop CC 2019.
 
 ### Prerequisites
 
-* Any C++ IDE
-* Simple Directmedia Layer 2 (SDL2)
+The project requires:
 
-   To setup SDL2, follow this [link](http://lazyfoo.net/tutorials/SDL/01_hello_SDL/index.php)
+C++17 compatible compiler
+CMake 3.20 or newer
+SDL2
+SDL2_image
+SDL2_mixer
+SDL2_ttf
+pkg-config
 
-### Running
+On Debian/Ubuntu-based systems, the required dependencies can be installed with:
 
-1. Setup SDL2 properly on your system
-2. Run the program on your IDE
+sudo apt install cmake build-essential pkg-config \
+    libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev### Running
 
 ## Built With
 
-* [Visual Studio 2019](https://visualstudio.microsoft.com/) - The main C++ IDE used
-* [SDL2](https://libsdl.org/) - The main modules to create multimedia/videogames
+Clone the repository and create a separate build directory:
+
+git clone <repository-url>
+cd <repository-directory>
+
+mkdir build
+cd build
+
+cmake ..
+cmake --build .
+
+The executable will be generated in the build directory.
 
 ## Acknowledgments
 
-* [Lazy Foo](http://lazyfoo.net/tutorials/SDL/index.php) - SDL2 Game Programming Tutorials
-* Some youtuber who uploads sound effect used in this game.
+The original project was created by andreanlay.

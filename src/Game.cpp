@@ -108,7 +108,7 @@ void Game::initGame(){
 		cout << "Could not initialize SDL: " << SDL_GetError() << '\n';
 		exit(-1);
 	}
-	app.window = SDL_CreateWindow("Space Impact V1.5", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, SDL_WINDOW_SHOWN);
+	app.window = SDL_CreateWindow("Space Impact V1.0", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, SDL_WINDOW_SHOWN);
 	if(app.window == nullptr){
 		cout << "Could not create window : " << SDL_GetError() << '\n';
 		exit(-1);

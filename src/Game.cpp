@@ -254,15 +254,9 @@ Game::initGame()
     app.running = false;
 
     file.open("scores.txt", ios::in);
-		if (file)
-		{
-				file >> highScore;
-				file.close();
-		}	
-		else
-		{
-		    highScore = 0;
-		}
+		file >> highScore;
+		file.close();
+		file.clear();
 
     enemySpawnTimer = 60;
 
@@ -876,9 +870,10 @@ Game::updateScene()
         if (score > highScore)
         {
             highScore = score;
-            file.close();
             file.open("scores.txt", ios::out);
             file << highScore;
+            file.close();
+						file.clear();
         }
         endScreen();
         score = 0;

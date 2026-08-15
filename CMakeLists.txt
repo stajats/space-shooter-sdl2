@@ -29,6 +29,11 @@ target_compile_options(space-shooter PRIVATE
 
 target_compile_options(space-shooter PRIVATE $<$<CONFIG:Debug>:-g>)
 
+if(ENABLE_COVERAGE)
+    target_compile_options(space-shooter PRIVATE --coverage)
+    target_link_options(space-shooter PRIVATE --coverage)
+endif()
+
 target_include_directories(space-shooter PRIVATE
     ${CMAKE_SOURCE_DIR}/include
     ${SDL2_INCLUDE_DIRS}

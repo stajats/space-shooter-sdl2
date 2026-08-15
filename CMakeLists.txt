@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 
-project(SpaceShooter VERSION 1.0.0 LANGUAGES CXX)
+project(SpaceShooter VERSION 1.1.0 LANGUAGES CXX)
 
 find_package(PkgConfig REQUIRED)
 
@@ -26,6 +26,13 @@ target_compile_options(space-shooter PRIVATE
     -Wall
     -Wextra
 )
+
+target_compile_options(space-shooter PRIVATE $<$<CONFIG:Debug>:-g>)
+
+if(ENABLE_COVERAGE)
+    target_compile_options(space-shooter PRIVATE --coverage)
+    target_link_options(space-shooter PRIVATE --coverage)
+endif()
 
 target_include_directories(space-shooter PRIVATE
     ${CMAKE_SOURCE_DIR}/include

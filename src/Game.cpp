@@ -202,7 +202,7 @@ Game::initGame()
         cout << "Could not initialize TTF : " << TTF_GetError() << '\n';
         exit(-1);
     }
-    app.window = SDL_CreateWindow("Space Impact V1.0",
+    app.window = SDL_CreateWindow("Space Impact V1.1",
                                   SDL_WINDOWPOS_CENTERED,
                                   SDL_WINDOWPOS_CENTERED,
                                   WIDTH,
